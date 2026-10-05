@@ -1,0 +1,70 @@
+{
+  "_not": "ÖRNEK VERİ: Bu dosyadaki sayıların hepsi uydurma demo sayılarıdır, hiçbir şey ölçülmedi. Kendi videonda yalnız kendi ölçtüğün sayıları yaz; ölçmediysen ekranda 'örnek veri' etiketi kalsın.",
+  "marka": "Deney defteri",
+  "etiket": "örnek veri",
+  "sahneler": [
+    {
+      "tur": "baslik",
+      "sure": 2.6,
+      "bolum": "deney",
+      "ust": "aynı iş · üç ayar · tek soru",
+      "satirlar": ["Aynı işi", "*üç farklı* ayarla yaptırdım."]
+    },
+    {
+      "tur": "yazi",
+      "sure": 3.4,
+      "ust": "aynı istem",
+      "satirlar": ["Üçüne de *aynı* istemi verdim:"],
+      "metin": "Bu tabloyu özetle, üç madde çıkar."
+    },
+    {
+      "tur": "olcer",
+      "sure": 3.2,
+      "satirlar": ["Aynı model,", "üç farklı *düşünme* seviyesi."],
+      "seviyeler": [{ "ad": "Hızlı" }, { "ad": "Dengeli" }, { "ad": "Derin" }]
+    },
+    {
+      "tur": "sayac",
+      "sure": 3.0,
+      "bolum": "sonuç",
+      "ust": "derin ayarın süresi",
+      "deger": 312,
+      "sonek": " sn",
+      "alt": "Hızlı ayar: *41 saniye.*"
+    },
+    {
+      "tur": "sutunlar",
+      "sure": 4.2,
+      "satirlar": ["Kalite puanı,", "ayar sırasıyla *aynı.*"],
+      "not": "10 deneme · ortalama puan",
+      "ogeler": [
+        { "ad": "Hızlı", "deger": 62 },
+        { "ad": "Dengeli", "deger": 81 },
+        { "ad": "Derin", "deger": 88 }
+      ]
+    },
+    {
+      "tur": "karsilastirma",
+      "sure": 4.2,
+      "bolum": "maliyet",
+      "satirlar": ["Peki *bedeli?*"],
+      "a": { "ad": "Hızlı", "ust": "maliyet", "deger": "$0,04", "altEtiket": "süre", "alt": "41 sn" },
+      "b": { "ad": "Derin", "ust": "maliyet", "deger": "$0,61", "altEtiket": "süre", "alt": "5 dk 12 sn" },
+      "fark": { "deger": "15×", "etiket": "fark", "alt": "7 puan için" }
+    },
+    {
+      "tur": "liste",
+      "sure": 3.8,
+      "bolum": "ders",
+      "satirlar": ["Ne zaman *hangisi?*"],
+      "ogeler": ["Kısa iş: *hızlı* ayar", "Günlük kod: *dengeli*", "Zor problem: *derin*"]
+    },
+    {
+      "tur": "soru",
+      "sure": 3.0,
+      "bolum": "soru",
+      "satirlar": ["Sen hangi ayarı", "*kullanıyorsun?*"],
+      "alt": "yorumlara yaz"
+    }
+  ]
+}

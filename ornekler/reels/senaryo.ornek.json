@@ -1,0 +1,35 @@
+{
+ "_not": "Örnek senaryo: 'Claude Code'da işini kolaylaştıracak 3 şey'. Çıpalar README'deki okuma metninin kelimeleridir; kendi kaydında `reels.py kelimeler` çıktısına göre düzelt. gorsel/plan-modu.png KENDİ ekran görüntün olmalı (yoksa o vuruşu sil).",
+ "tema": "acik",
+ "vurgu": ["CLAUDE.md", "plan", "skill"],
+ "altyazi_duzelt": {},
+ "kuyruk": 1.8,
+ "vuruslar": [
+  {"duzen": "yuz"},
+  {"kelime": "üç", "kart": {"tur": "sayi", "deger": "3", "etiket": "işini kolaylaştıran şey", "alt": "Claude Code"}},
+  {"kelime": "Birincisi", "kart": {"tur": "agac", "kok": "projem/", "satirlar": [
+    {"yazi": "src/"},
+    {"yazi": "package.json"},
+    {"yazi": "CLAUDE.md", "vurgu": true, "kelime": "köküne"}]}},
+  {"kelime": "kurallarını", "kart": {"tur": "dosya", "ad": "CLAUDE.md", "yaz": true, "satirlar": [
+    {"yazi": "# Kurallar"},
+    {"yazi": "- Testler geçmeden bitti deme", "kelime": "içine"},
+    {"yazi": "- Kod yorumları Türkçe"}]}},
+  {"kelime": "Claude her", "duzen": "yuz"},
+  {"kelime": "Terminalde", "kart": {"tur": "terminal", "baslik": "~/projem", "satirlar": [
+    {"yazi": "/init", "tur": "komut", "kelime": "init"},
+    {"yazi": "CLAUDE.md hazır", "tur": "tamam", "kelime": "taslağı"}]}},
+  {"kelime": "İkincisi", "kart": {"tur": "baslik", "etiket": "İkincisi", "satirlar": ["*plan* modu"]}},
+  {"kelime": "Shift", "kart": {"tur": "gorsel", "yol": "gorsel/plan-modu.png", "etiket": "Shift+Tab iki kez"}},
+  {"kelime": "kod", "kart": {"tur": "liste", "baslik": "Plan modunda", "isaret": "tik", "maddeler": [
+    {"yazi": "Önce plan çıkarır", "kelime": "plan çıkarıyor"},
+    {"yazi": "Onayın olmadan dosyaya dokunmaz", "kelime": "onaylamadan"}]}},
+  {"kelime": "Üçüncüsü", "kart": {"tur": "agac", "kok": ".claude/skills/", "satirlar": [
+    {"yazi": "haftalik-rapor/"},
+    {"yazi": "  SKILL.md", "vurgu": true, "kelime": "SKILL"}]}},
+  {"kelime": "O iş", "kart": {"tur": "sohbet", "baslik": "Claude Code", "mesajlar": [
+    {"kim": "sen", "yazi": "Bu haftanın raporunu çıkar", "kelime": "gelince"},
+    {"kim": "ai", "yazi": "haftalik-rapor skill'ini kullanıyorum", "kelime": "kendisi"}]}},
+  {"kelime": "Sen bunlardan", "duzen": "grafik", "kart": {"tur": "soru", "soru": "Sen hangisini kullanıyorsun?", "anahtar": "plan modu"}}
+ ]
+}

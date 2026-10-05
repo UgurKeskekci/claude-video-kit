@@ -1,0 +1,19 @@
+# çalışma çıktıları ve medya repoya girmez
+calisma/
+*.mp4
+*.mov
+*.MP4
+*.MOV
+*.wav
+*.m4a
+*.LRF
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+out/
+# indirilen modeller
+modeller/
+# Remotion: fontlar npm install sırasında ../fontlar/ klasöründen kopyalanır (tek kaynak fontlar/)
+remotion/public/fonts/

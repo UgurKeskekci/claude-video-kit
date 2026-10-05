@@ -1,0 +1,7 @@
+[
+ {"etiket": "giriş", "bas": 0, "son": 58.2, "goruntu": "kamera"},
+ {"etiket": "kurulum", "bas": 58.2, "son": 190.0, "goruntu": "ekran"},
+ {"etiket": "test koşuyor", "bas": 190.0, "son": 265.5, "goruntu": "ekran-hizli"},
+ {"etiket": "sonuç", "bas": 265.5, "son": 330.0, "goruntu": "ekran", "kose": false},
+ {"etiket": "kapanış", "bas": 330.0, "son": 372.4, "goruntu": "kamera"}
+]

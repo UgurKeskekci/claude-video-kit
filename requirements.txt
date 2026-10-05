@@ -1,0 +1,5 @@
+faster-whisper>=1.0
+# PyAV 19, faster-whisper 1.2'nin dosyadan ses açma çağrısını kırıyor (metadata_errors); 18'de çalışıyor.
+av>=12,<19
+numpy>=1.26
+Pillow>=10.0

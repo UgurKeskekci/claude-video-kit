@@ -1,0 +1,26 @@
+{
+  "name": "claude-video-kit-remotion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "x-animasyon skill'inin Remotion projesi: JSON sahne listesinden editoryal hareketli grafik videosu. Remotion MIT degildir, lisans: https://www.remotion.dev/license",
+  "scripts": {
+    "postinstall": "node scripts/fontlari-kopyala.mjs",
+    "fontlar": "node scripts/fontlari-kopyala.mjs",
+    "studio": "remotion studio",
+    "still": "remotion still",
+    "render": "remotion render",
+    "tip": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.290",
+    "@remotion/zod-types": "4.0.290",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "remotion": "4.0.290",
+    "zod": "3.22.3"
+  },
+  "devDependencies": {
+    "@types/react": "19.0.0",
+    "typescript": "5.6.3"
+  }
+}
