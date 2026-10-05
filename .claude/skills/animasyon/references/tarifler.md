@@ -94,6 +94,10 @@ lazım olur: **iris** (daire açılır/kapanır), **perde** (yatay silme + parla
   oturtmak için `kesim - 0.45 * sure`'de başlat.
 - **Yazma sesi tek tek tuş:** eşit aralıklı tik dizisi "tırrrt" diye duyuluyor. `tus()` +
   `yazma()` insan ritmi (70-140 ms, ara sıra duraksama) verir.
+- **Tuş sesinde saf ton olmaz:** eski `tus()` 170-560 Hz sönümlü SİNÜS kullanıyordu; enerjinin
+  ~%75'i tek 1/6 oktavda toplanıyor, "bip" gibi yapay duyuluyordu. Şimdiki `tus()` yalnız gürültü
+  (tık + plastik gövde + yumuşak dip + sessiz bırakma tıkı, tuştan tuşa renk/seviye farkı); aynı
+  ölçümde tek 1/6 oktavın payı ~%10. Boşluk/Enter için `tus(r, bosluk=True)`.
 - Kart/öğe girişine "bik bik" pop sesi koyma; ya yumuşak whoosh ya hiç.
 - Geçiş/koşu süresi vuruşun katı olsun: koşu 1,4 sn iken varış tiki vuruş dışına düşüyordu;
   1,25 sn (96 BPM'de 2 vuruş) ile oturdu. Durak = 2 ölçü.

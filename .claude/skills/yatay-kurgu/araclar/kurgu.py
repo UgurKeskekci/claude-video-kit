@@ -320,6 +320,11 @@ def main(argv=None) -> int:
     p.add_argument("--kose-kirp", default="0.5,0.42,0.75",
                    help="kameradan alınacak kare: merkez x, merkez y (0-1), kenar / yükseklik")
     p.add_argument("--kose-sekil", default="daire", choices=("daire", "yuvarlak"))
+    p.add_argument("--kamera-filtre", default="",
+                   help="kamera görüntüsüne uygulanacak ffmpeg filtresi (renk ayarı), ör. "
+                        "\"curves=master='0/0.015 0.22/0.18 0.5/0.5 0.78/0.82 1/0.985',eq=saturation=1.14\"")
+    p.add_argument("--kamera-yakin", type=float, default=1.0,
+                   help="kamera bloklarında sabit yakınlaştırma (1 = kapalı, ör. 1.15); oda geniş, kişi küçükse")
     p.add_argument("--ses", default="temiz", choices=("temiz", "ham"),
                    help="temiz: alçak kesen + gürültü azaltma + kompresör + −14 LUFS · ham: yalnız −14 LUFS")
     p.add_argument("--paralel", type=int, default=2, help="aynı anda kaç parça üretilsin (varsayılan 2)")

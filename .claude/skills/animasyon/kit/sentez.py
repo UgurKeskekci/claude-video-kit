@@ -6,7 +6,7 @@ Perde ve tını ölçülerek düzeltildi (bkz. references/tarifler.md "Ses"):
   başlangıç DC'si sıfırlanır, etkin gecikme N-0.5 örnek (yoksa tizde +32 cent).
 - whoosh YUMUŞAK: frekansı süpürülen bant + çan zarfı. Eski geniş bant "pıssst" whoosh'u
   sert ve tıslı bulundu, kaldırıldı.
-- Klavye: tek tek tuş sesi (basış + dibe vuruş + bırakma), insan ritminde; eşit aralıklı
+- Klavye: tek tek tuş sesi (tık + plastik gövde + dip + bırakma, SAF TON YOK), insan ritminde; eşit aralıklı
   "tırrrt" tik dizisi yazma sesi yerine kullanılmaz.
 
     import sys; sys.path.insert(0, ".claude/skills/animasyon/kit")
@@ -182,31 +182,100 @@ def whoosh(sure=0.6, alt=380.0, ust=1900.0, tohum=7):
     return v / max(np.abs(v).max(), 1e-9) * 0.5
 
 
-def _gurultu_bant(r, n, alt, ust):
-    x = r.standard_normal(n)
-    f = np.fft.rfft(x)
-    fr = np.fft.rfftfreq(n, 1 / SR)
-    f[(fr < alt) | (fr > ust)] = 0
-    return np.fft.irfft(f, n)
+# Dizüstü (MacBook tipi makas) klavye, yakın ama sert olmayan kayıt gibi. SAF TON YOK: eski tuşun
+# 170-560 Hz sönümlü sinüsü enerjinin ~%75'ini tek 1/6 oktavda topluyordu ("bip", yapay). Şimdi
+# her parça zarflanmış gürültü + geniş spektral şekil:
+#   tık      ~1-3 ms, 1,5 kHz üstü geniş bant (tuşa ilk temas)
+#   gövde    400-2500 Hz bant gürültü, tuştan tuşa kayan geniş tepe, ~15-25 ms'de söner (plastik)
+#   dip      300 Hz altı yumuşak vuruş, ~25-35 ms (tuş dibe oturur)
+#   bırakma  50-110 ms sonra 10-14 dB daha sessiz tık + kısa gövde (tuş geri kalkar)
+#   oda      2,5 ms sonra başlayan çok kısa dağınık yansıma, -18 dB (tuşa göre değişir: sabit renk yok)
+# Tuştan tuşa perde/EQ ±%15-18, seviye ±3 dB. Boşluk/Enter daha tok, ~2 dB yüksek, sabitleyici
+# teli yüzünden küçük ikinci vuruşu var.
+_TUS_ON = int(0.004 * SR)      # sıfır fazlı süzgecin ön çınlaması bu boşluğa düşer, sonra atılır
+
+
+def _hp(f, fc, k=2):
+    return 1 / np.sqrt(1 + (fc / np.maximum(f, 1e-3)) ** (2 * k))
+
+
+def _lp(f, fc, k=2):
+    return 1 / np.sqrt(1 + (f / fc) ** (2 * k))
+
+
+def _tepe(f, fc, db, oktav):
+    """Log-frekansta çan biçimli GENİŞ tepe: tek frekansa kilitlenmez, ton üretmez."""
+    return 10 ** (db / 20 * np.exp(-0.5 * (np.log2(np.maximum(f, 1.0) / fc) / oktav) ** 2))
+
+
+def _renk(x, kazanc):
+    """Sıfır fazlı FFT süzgeci; kazanc(f) genlik eğrisi."""
+    f = np.fft.rfftfreq(len(x), 1 / SR)
+    return np.fft.irfft(np.fft.rfft(x) * kazanc(f), len(x))
+
+
+def _zarf(n, bas, atak, sonum, son=None):
+    """bas'tan başlar: yükseltilmiş kosinüs atak + üstel sönüm (son verilirse ondan sonra sıfır)."""
+    t = np.arange(n) / SR - bas
+    a = np.clip(t / atak, 0, 1)
+    z = np.where(t < 0, 0.0, (0.5 - 0.5 * np.cos(np.pi * a)) * np.exp(-np.maximum(t - atak, 0) / sonum))
+    if son is not None:
+        z[t > son] = 0
+    return z
+
+
+def _birim(x):
+    return x / max(float(np.sqrt((x ** 2).sum())), 1e-12)
+
+
+def _vurus(rng, n, bas, s, fc, fc2, sonum, tik_db):
+    """Tık + plastik gövde; parçalar enerjiye göre dengelenir."""
+    tik = rng.standard_normal(n) * _zarf(n, bas, 0.00025, 0.0009, son=0.003)
+    tik = _renk(tik, lambda f: _hp(f, 1500 * s) * _lp(f, 7000) * _tepe(f, 3500 * s, 2, 0.5))
+    gov = rng.standard_normal(n) * _zarf(n, bas + 0.0003, 0.0006, sonum)
+    gov = _renk(gov, lambda f: _hp(f, 400 * s) * _lp(f, 2500 * s) * _tepe(f, fc, 7, 0.35) * _tepe(f, fc2, 4, 0.3))
+    return _birim(gov) + _birim(tik) * 10 ** (tik_db / 20)
 
 
 def tus(r=None, bosluk=False):
-    """Tek dizüstü klavye tuşu: basış tıkı (2-6 kHz, 3 ms) + dibe vuruş (300-560 Hz, 18 ms)
-    + bırakma tıkı (60-90 ms sonra). Her tuşta ton/güç değişir (tohumlu: render deterministik)."""
-    r = r or rng
-    n = int(0.16 * SR)
-    t = np.arange(n) / SR
-    v = np.zeros(n)
-    k = int(0.004 * SR)
-    v[:k] += _gurultu_bant(r, k, 2000, 6000) * np.exp(-np.arange(k) / SR / 0.0012) * 0.5
-    f0 = r.uniform(170, 240) if bosluk else r.uniform(300, 560)
-    v += np.sin(2 * np.pi * f0 * t) * np.exp(-t / (0.026 if bosluk else 0.018)) * 0.55 * (t > 0.002)
-    v += _gurultu_bant(r, n, 500, 2500) * np.exp(-t / 0.01) * 0.25
-    b = int(r.uniform(0.06, 0.09) * SR)
-    kb = int(0.003 * SR)
-    if b + kb < n:
-        v[b:b + kb] += _gurultu_bant(r, kb, 2500, 7000) * np.exp(-np.arange(kb) / SR / 0.001) * 0.3
-    return fft_filtre(v, ust=6000) * r.uniform(0.7, 1.0) * 0.5
+    """Tek dizüstü klavye tuşu (MacBook tipi). Boşluk/Enter (bosluk=True) daha tok, biraz yüksek.
+    Yalnız gürültü temelli; aynı rng durumu -> aynı ses (render deterministik). r yoksa modülün rng'si."""
+    rng = r or globals()["rng"]
+    s0 = rng.uniform(0.84, 1.18)                   # perde/EQ ölçeği, tuştan tuşa
+    seviye = 10 ** (rng.uniform(-3, 3) / 20)
+    fc = rng.uniform(1000, 1700) * s0              # gövdenin geniş tepesi
+    fc2 = fc * rng.uniform(1.9, 2.5)
+    sonum = rng.uniform(0.004, 0.007)
+    dip_gec = rng.uniform(0.0015, 0.004)
+    dip_sonum = rng.uniform(0.007, 0.011)
+    birak = rng.uniform(0.05, 0.11)
+    birak_db = rng.uniform(-14, -10)
+    s = s0
+    if bosluk:
+        s, fc, fc2 = s0 * 0.62, fc * 0.6, fc2 * 0.6
+        sonum *= 1.7
+        dip_sonum *= 1.35
+        birak += 0.02
+        seviye *= 10 ** (2 / 20)
+    n = _TUS_ON + int(0.16 * SR)
+    b = _TUS_ON / SR
+    v = _vurus(rng, n, b, s, fc, fc2, sonum, -6)
+    dip = rng.standard_normal(n) * _zarf(n, b + dip_gec, 0.002, dip_sonum)
+    dip = _renk(dip, lambda f: _lp(f, (180 if bosluk else 230) * s0) * _hp(f, 90))
+    v += _birim(dip) * 10 ** ((-2 if bosluk else -5) / 20)
+    if bosluk:                                     # sabitleyici tel: küçük ikinci vuruş
+        v += _vurus(rng, n, b + rng.uniform(0.007, 0.013), s * 1.1, fc * 1.15, fc2 * 1.1, sonum * 0.7, -8) \
+            * 10 ** (-9 / 20)
+    v += _vurus(rng, n, b + birak, s * 1.1, fc * 1.12, fc2 * 1.05, 0.0025, -3) * 10 ** (birak_db / 20)
+    k = int(0.035 * SR)                            # oda: kısa dağınık yansıma
+    t = np.arange(k) / SR
+    ir = _birim(_renk(rng.standard_normal(k) * np.exp(-t / 0.007) * (t > 0.0025),
+                      lambda f: _lp(f, 4500) * _hp(f, 250)))
+    m = n + k - 1
+    v = v + np.fft.irfft(np.fft.rfft(v, m) * np.fft.rfft(ir, m), m)[:n] * 10 ** (-18 / 20)
+    v = _renk(v, lambda f: _lp(f, 8500, 1))[_TUS_ON:]
+    v[-240:] *= np.linspace(1, 0, 240)
+    return v * seviye * 1.5          # 1,5: 5 sn yazma dizisi eski tuştan 2 LU sessiz (ölçüldü)
 
 
 def yazma(t0, sure, tohum=1):

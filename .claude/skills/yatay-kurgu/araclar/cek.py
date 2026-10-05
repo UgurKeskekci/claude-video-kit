@@ -98,11 +98,11 @@ def parca_komutu(p: dict, ay: dict) -> tuple[list[str], list[str]]:
     gir, fz = [], []
     gor = p["gorsel"]
     if gor == "kamera" or not ay.get("ekran"):
-        z = p.get("zoom", 1.0) or 1.0
+        z = (p.get("zoom", 1.0) or 1.0) * ay.get("yakin", 1.0)
         gir += [*coz, *_ss(i), "-t", f"{kaynak_sure:.4f}", "-i", ay["video"]]
         kirp = "" if z == 1.0 else f"crop=iw/{z}:ih/{z}:(iw-iw/{z})*0.5:(ih-ih/{z})*0.4,"
         fz.append(f"[0:v]{pts},fps={fps},{uzat},{kirp}scale={W}:{H}:force_original_aspect_ratio=increase:flags=lanczos,"
-                  f"crop={W}:{H},setsar=1,format=yuv420p[v0]")
+                  f"crop={W}:{H},{ay.get('kf', '')}setsar=1,format=yuv420p[v0]")
         son = "v0"
     else:
         et = i + ay["ofset"] + ay["kayma"] * i
@@ -117,7 +117,7 @@ def parca_komutu(p: dict, ay: dict) -> tuple[list[str], list[str]]:
             D, kal, (x, y), (cw, ch, cx, cy) = ay["D"], ay["kal"], ay["kose_xy"], ay["kirp"]
             gir += [*coz, *_ss(i), "-t", f"{kaynak_sure:.4f}", "-i", ay["video"],
                     "-i", str(ay["gorsel"]["maske"]), "-i", str(ay["gorsel"]["cerceve"])]
-            fz.append(f"[{k}:v]{pts},fps={fps},{uzat},crop={cw}:{ch}:{cx}:{cy},scale={D}:{D}:flags=lanczos,"
+            fz.append(f"[{k}:v]{pts},fps={fps},{uzat},crop={cw}:{ch}:{cx}:{cy},scale={D}:{D}:flags=lanczos,{ay.get('kf', '')}"
                       f"format=yuva420p[c0];[{k + 1}:v]format=gray[m];[c0][m]alphamerge[c]")
             fz.append(f"[{son}][{k + 2}:v]overlay={x - kal}:{y - kal}[b1];[b1][c]overlay={x}:{y}[b2]")
             son, k = "b2", k + 3
@@ -207,7 +207,9 @@ def calistir(proje: pathlib.Path, a) -> int:
     enc, venc, coz = medya.kodlayici(a.kodlayici, W, H)
     ekranli = any(p["gorsel"] != "kamera" for p in pp[bas:bit + 1])
     ay = {"W": W, "H": H, "fps": fps, "venc": venc, "coz": coz, "video": kaynak["video"], "ekran": None,
-          "ofset": 0.0, "kayma": 0.0, "kose": a.kose, "dizin": proje / "parca", "ekran_kirp": None}
+          "ofset": 0.0, "kayma": 0.0, "kose": a.kose, "dizin": proje / "parca", "ekran_kirp": None,
+          "kf": (a.kamera_filtre.strip().rstrip(",") + ",") if getattr(a, "kamera_filtre", None) else "",
+          "yakin": max(1.0, getattr(a, "kamera_yakin", 1.0) or 1.0)}
     if a.ekran_kirp:
         if not re.fullmatch(r"\d+:\d+:\d+:\d+", a.ekran_kirp.strip()):
             raise SystemExit(f"--ekran-kirp '{a.ekran_kirp}' anlaşılmadı (genişlik:yükseklik:x:y, ör. 2468:1388:46:47)")
@@ -235,7 +237,7 @@ def calistir(proje: pathlib.Path, a) -> int:
                   gorsel=gorseller(proje / "kontrol" / "gorsel", D, kal, a.kose_sekil, H, hizlar))
     kaynak_imza = [(f, pathlib.Path(f).stat().st_size) for f in (kaynak["video"], ay["ekran"]) if f]
     ay["imza"] = [W, H, fps, enc, venc, ay["ekran_kirp"], a.kose, a.kose_boyut, a.kose_kirp, a.kose_sekil, ay["ofset"], ay["kayma"],
-                  kaynak_imza]
+                  kaynak_imza, ay["kf"], ay["yakin"]]
     ay["dizin"].mkdir(parents=True, exist_ok=True)
 
     t0 = time.time()
